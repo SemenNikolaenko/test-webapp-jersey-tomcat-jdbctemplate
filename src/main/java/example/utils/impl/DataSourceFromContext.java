@@ -5,8 +5,16 @@ import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
 import javax.sql.DataSource;
 
-public class CustomDataSourceImpl implements CustomDataSource {
-
+/**
+ * <code>DataSourceFromContext</code> is a class which return {@link DataSource} from context.xml file
+ * implements {@link CustomDataSource}
+ */
+public class DataSourceFromContext implements CustomDataSource {
+    /**
+     * retrieve {@link DataSource} through using {@link JndiDataSourceLookup}
+     *
+     * @return
+     */
     @Override
     public DataSource getDataSource() {
         JndiDataSourceLookup jndiDataSourceLookup = new JndiDataSourceLookup();

@@ -2,12 +2,15 @@ package example.model.dto;
 
 import example.model.DummyObject;
 
-public class ObjectWithServiceParameters {
+/**
+ * Dto class which can provide object with additional service info
+ */
+public class ObjectWithServiceInfo {
     private DummyObject data;
     private String response;
     private String request;
 
-    public ObjectWithServiceParameters() {
+    public ObjectWithServiceInfo() {
     }
 
     public DummyObject getData() {

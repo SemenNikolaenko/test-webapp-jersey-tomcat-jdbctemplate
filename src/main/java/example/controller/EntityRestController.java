@@ -3,11 +3,11 @@ package example.controller;
 import example.exception.NoDataFoundException;
 import example.exception.WrongInputParameterException;
 import example.model.DummyObject;
-import example.model.dto.ObjectWithServiceParameters;
+import example.model.dto.ObjectWithServiceInfo;
 import example.service.DummyObjectService;
 import example.service.DummyObjectServiceImpl;
 import example.utils.impl.ConverterToRequiredFormImpl;
-import example.utils.impl.DtoConverter;
+import example.utils.DtoConverter;
 
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
@@ -16,37 +16,64 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-
+/**
+ * Rest controller which can send response on request.
+ * response consist from object which was retrieved from database
+ * and some service info
+ */
 @Path("/bykey")
 public class EntityRestController {
-
+    //converter which help wrap object from db and add some service info
     DtoConverter converter = new ConverterToRequiredFormImpl();
+    //service which work with db not directly
     DummyObjectService dummyObjectService = new DummyObjectServiceImpl();
 
-
+    /**
+     * method receive get request with param , and send in response ready object
+     * or object with exception text, processing of exception provides method{@link EntityRestController#handleAllExceptionForReadyObjectAndReturnResponse(String)}
+     * Activated when customer send get request to path localhost:8080/db2any/bykey/getjson
+     *
+     * @param id receive object parameter, and with it help retrieve ready object from database
+     * @return ready object with all fields
+     */
     @GET
     @Path("/getjson")
     @Produces(MediaType.APPLICATION_JSON)
-    public ObjectWithServiceParameters getReadyObjectFromDb(
+    public ObjectWithServiceInfo getReadyObjectFromDb(
             @QueryParam("id") String id
     ) {
-        ObjectWithServiceParameters readyObject;
+        //future ready object
+        ObjectWithServiceInfo readyObject;
+        //invokes private method which may handles probable exception
         readyObject = handleAllExceptionForReadyObjectAndReturnResponse(id);
 
         return readyObject;
     }
 
-    public ObjectWithServiceParameters handleAllExceptionForReadyObjectAndReturnResponse(String id) {
+    /**
+     * Inner method  designed to handling any exception occurs in process composing ready object from database
+     *
+     * @param id  receive object parameter, and with it help retrieve ready object from database
+     * @return ready object with all fields
+     */
+    private ObjectWithServiceInfo handleAllExceptionForReadyObjectAndReturnResponse(String id) {
+        //object from database
         DummyObject object;
-        ObjectWithServiceParameters readyObject;
+        ObjectWithServiceInfo readyObject;
         try {
             object = dummyObjectService.getObjectFromDbById(id);
             readyObject = converter.convert(object, id, "ok");
+            //catch exception which will be thrown when the program failed search config datasource, or search sql query
         } catch (NamingException e) {
+            //created object with null inner object, and comprise only exception's text and input parameter
             readyObject = converter.convert(null, id, e.getMessage());
+            //catch exception which will be thrown when the program don't find any information in database
         } catch (NoDataFoundException e) {
+            //created object with null inner object, and comprise only exception's text and input parameter
             readyObject = converter.convert(null, id, e.getMessage());
+            //catch exception which will be thrown when input parameter is wrong
         } catch (WrongInputParameterException e) {
+            //created object with null inner object, and comprise only exception's text and input parameter
             readyObject = converter.convert(null, id, e.getMessage());
         }
         return readyObject;

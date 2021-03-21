@@ -1,5 +1,8 @@
 package example.model;
 
+/**
+ * Object from database which store any info
+ */
 public class DummyObject {
     private int id;
     private String name;
