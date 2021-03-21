@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 public interface CustomRowMapper {
     /**
      * retrieve new instance of {@link RowMapper} for specific object
-     * @return
+     * @return ready  {@link RowMapper}
      */
      RowMapper getRowMapper();
 }
