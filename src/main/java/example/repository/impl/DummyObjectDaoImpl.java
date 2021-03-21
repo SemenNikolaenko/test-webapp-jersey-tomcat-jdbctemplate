@@ -1,13 +1,14 @@
 package example.repository.impl;
 
+import example.exception.NoDatabaseConnectionException;
 import example.exception.NoDataFoundException;
 import example.exception.WrongInputParameterException;
 import example.model.DummyObject;
 import example.repository.DummyObjectDao;
 import example.utils.CustomRowMapper;
-import example.utils.impl.RowMapperForDummyObject;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -52,6 +53,8 @@ public class DummyObjectDaoImpl implements DummyObjectDao {
         //if input parameter was wrong throws new exception
         catch (BadSqlGrammarException e) {
             throw new WrongInputParameterException("Wrong input parameter");
+        }catch (CannotGetJdbcConnectionException e){
+            throw new NoDatabaseConnectionException("Connection to database was fail");
         }
         return objectFromDb;
     }

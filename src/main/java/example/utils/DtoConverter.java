@@ -8,10 +8,8 @@ import example.model.dto.ObjectWithServiceInfo;
 public interface DtoConverter {
     /**
      * converts one instance object to another with adding some important info
-     * @param object which will be converted
      * @param inputParams incoming data
-     * @param status response's status
      * @return ready object with service info
      */
-     ObjectWithServiceInfo convert(Object object, String status,String...inputParams);
+     ObjectWithServiceInfo convert(String...inputParams);
 }

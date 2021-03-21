@@ -9,9 +9,17 @@ import example.utils.DtoConverter;
  * class allows convert object from database to dto object with service info
  */
 public class ConverterToRequiredFormImpl implements DtoConverter {
-    public ObjectWithServiceInfo convert(Object object, String status, String... inputParams) {
+    private Object innerObject;
+    private String status;
+
+    public ConverterToRequiredFormImpl(Object innerObject, String status) {
+        this.innerObject = innerObject;
+        this.status = status;
+    }
+
+    public ObjectWithServiceInfo convert(String... inputParams) {
         ObjectWithServiceInfo output = new ObjectWithServiceInfo();
-        output.setData((DummyObject) object);
+        output.setData((DummyObject) innerObject);
         //add response status and input parameter
         output.setResponse(status);
         output.setRequest(inputParams[0]);

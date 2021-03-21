@@ -1,5 +1,6 @@
 package example.controller;
 
+import example.exception.NoDatabaseConnectionException;
 import example.exception.NoDataFoundException;
 import example.exception.WrongInputParameterException;
 import example.model.DummyObject;
@@ -24,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/bykey")
 public class EntityRestController {
     //converter which help wrap object from db and add some service info
-    DtoConverter converter = new ConverterToRequiredFormImpl();
+    DtoConverter converter;
     //service which work with db not directly
     DummyObjectService dummyObjectService = new DummyObjectServiceImpl();
 
@@ -53,29 +54,33 @@ public class EntityRestController {
     /**
      * Inner method  designed to handling any exception occurs in process composing ready object from database
      *
-     * @param id  receive object parameter, and with it help retrieve ready object from database
+     * @param id receive object parameter, and with it help retrieve ready object from database
      * @return ready object with all fields
      */
     private ObjectWithServiceInfo handleAllExceptionForReadyObjectAndReturnResponse(String id) {
         //object from database
-        DummyObject object;
-        ObjectWithServiceInfo readyObject;
+        DummyObject object = null;
+        ObjectWithServiceInfo readyObject = null;
         try {
             object = dummyObjectService.getObjectFromDbById(id);
-            readyObject = converter.convert(object, id, "ok");
+            converter = new ConverterToRequiredFormImpl(object, "ok");
             //catch exception which will be thrown when the program failed search config datasource, or search sql query
         } catch (NamingException e) {
             //created object with null inner object, and comprise only exception's text and input parameter
-            readyObject = converter.convert(null, id, e.getMessage());
+            converter = new ConverterToRequiredFormImpl(null, e.getMessage());
             //catch exception which will be thrown when the program don't find any information in database
         } catch (NoDataFoundException e) {
             //created object with null inner object, and comprise only exception's text and input parameter
-            readyObject = converter.convert(null, id, e.getMessage());
+            converter = new ConverterToRequiredFormImpl(null, e.getMessage());
             //catch exception which will be thrown when input parameter is wrong
         } catch (WrongInputParameterException e) {
             //created object with null inner object, and comprise only exception's text and input parameter
-            readyObject = converter.convert(null, id, e.getMessage());
+            converter = new ConverterToRequiredFormImpl(null, e.getMessage());
+            //created object with null inner object, and comprise only exception's text and input parameter
+        } catch (NoDatabaseConnectionException e) {
+            converter = new ConverterToRequiredFormImpl(null, e.getMessage());
         }
+        readyObject = converter.convert(id);
         return readyObject;
     }
 }
